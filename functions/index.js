@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const {
-  loginUser
+  loginUser,
+  signUpUser
 } = require('./APIs/users');
 const { 
   getAllTodos,
@@ -14,6 +15,8 @@ const app = require('express')();
 
 // Users
 app.post('/login', loginUser)
+app.post('/signup', signUpUser)
+
 // Todos
 app.get('/todos', getAllTodos);
 app.get('/todo/:todoId', getTodoById);
