@@ -3,6 +3,7 @@ const { db } = require('../util/admin');
 exports.getAllTodos = (request, response) => {
   db
     .collection('todos')
+    .where('username', '==', request.user.username)
     .orderBy('createdAt', 'desc')
     .get()
     .then((data) => {
@@ -19,7 +20,8 @@ exports.getAllTodos = (request, response) => {
     })
     .catch((err) => {
       console.log(
-        "======================\nerror getting todos\n======================"
+        "======================\nerror getting todos\n======================\n",
+        err.details
       );
       return response.status(500).json({error: err.code})
     })
@@ -55,7 +57,8 @@ exports.postOneTodo = (request, response) => {
   const newTodoItem = {
     title: title,
     body: body,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    username: request.user.username
   }
 
   db
@@ -79,6 +82,9 @@ exports.deleteTodo = (request, response) => {
     .then((doc) => {
       if(!doc.exists) {
         return response.status(404).json({ error: 'Todo not found'})
+      }
+      if(doc.data().username !== request.user.username) {
+        return response.status(403).json({ error: "Unauthorized" })
       }
       return document.delete();
     })
